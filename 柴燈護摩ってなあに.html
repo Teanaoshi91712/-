@@ -1,0 +1,461 @@
+<title>柴燈護摩ってなあに</title>
+<style>
+  :root{
+    --bg:#F3F4EC;
+    --bg-panel:#FFFFFF;
+    --ink:#2A2620;
+    --ink-soft:#5B564C;
+    --wood:#B97A42;
+    --wood-dark:#8A5A2E;
+    --flame:#E24E1B;
+    --flame-soft:#F6A23D;
+    --line:#C9BFA0;
+    --trivia-bg:#FBF3DE;
+    --trivia-edge:#E3C77E;
+    --focus:#2A6F7A;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1B1D19;
+      --bg-panel:#24261F;
+      --ink:#EDEAE0;
+      --ink-soft:#B8B3A4;
+      --wood:#9C6B3E;
+      --wood-dark:#6E4A28;
+      --flame:#F17A3C;
+      --flame-soft:#F6A23D;
+      --line:#5C5540;
+      --trivia-bg:#332D1C;
+      --trivia-edge:#6B5A2E;
+      --focus:#7FCBD6;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B1D19; --bg-panel:#24261F; --ink:#EDEAE0; --ink-soft:#B8B3A4;
+    --wood:#9C6B3E; --wood-dark:#6E4A28; --flame:#F17A3C; --flame-soft:#F6A23D;
+    --line:#5C5540; --trivia-bg:#332D1C; --trivia-edge:#6B5A2E; --focus:#7FCBD6;
+  }
+  :root[data-theme="light"]{
+    --bg:#F3F4EC; --bg-panel:#FFFFFF; --ink:#2A2620; --ink-soft:#5B564C;
+    --wood:#B97A42; --wood-dark:#8A5A2E; --flame:#E24E1B; --flame-soft:#F6A23D;
+    --line:#C9BFA0; --trivia-bg:#FBF3DE; --trivia-edge:#E3C77E; --focus:#2A6F7A;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif;
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 120px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    padding:64px 20px 48px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .hero-eyebrow{
+    display:inline-block;
+    font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
+    font-size:0.8rem;
+    letter-spacing:0.4em;
+    color:var(--flame);
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","UD Digi Kyokasho NK-R","Yu Gothic UI",sans-serif;
+    font-weight:700;
+    font-size:clamp(2.1rem,7vw,3.1rem);
+    margin:0 0 14px;
+    text-wrap:balance;
+    letter-spacing:0.02em;
+  }
+  .hero p.lead{
+    color:var(--ink-soft);
+    font-size:1.05rem;
+    max-width:32em;
+    margin:0 auto 36px;
+  }
+  .hero-art{
+    max-width:640px;
+    margin:0 auto;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 18px 40px -20px rgba(0,0,0,.45);
+  }
+  .hero-art img{display:block;width:100%;height:auto;}
+  .scrolldown{
+    margin-top:28px;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .scrolldown svg{width:16px;height:22px;}
+  @media (prefers-reduced-motion: no-preference){
+    .scrolldown svg{animation:bob 1.6s ease-in-out infinite;}
+  }
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
+
+  .howto{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:16px 20px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    margin:0 auto 8px;
+    max-width:560px;
+  }
+  .howto b{color:var(--ink);}
+
+  /* ---------- Trail ---------- */
+  .story{position:relative;}
+  .trail{
+    position:absolute;
+    left:50%;
+    top:0;
+    bottom:0;
+    width:2px;
+    background:repeating-linear-gradient(
+      to bottom,
+      var(--line) 0 6px,
+      transparent 6px 14px
+    );
+    transform:translateX(-50%);
+    z-index:0;
+  }
+
+  /* ---------- Panel ---------- */
+  .panel{
+    position:relative;
+    z-index:1;
+    padding:56px 0 8px;
+    opacity:1;
+    transform:none;
+  }
+  @media (prefers-reduced-motion: no-preference){
+    .panel{
+      opacity:0;
+      transform:translateY(22px);
+      transition:opacity .7s ease, transform .7s ease;
+    }
+    .panel.in{opacity:1;transform:none;}
+  }
+
+  .ordinal{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .ordinal .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--flame);
+    flex:none;
+  }
+  .ordinal span{
+    font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
+    font-size:0.95rem;
+    letter-spacing:0.3em;
+    color:var(--flame);
+    background:var(--bg);
+    padding:0 4px;
+  }
+
+  .frame{
+    background:var(--bg-panel);
+    border:10px solid var(--wood);
+    box-shadow:0 0 0 1px var(--wood-dark) inset, 0 10px 26px -14px rgba(0,0,0,.35);
+    border-radius:2px;
+    padding:6px;
+    margin:0 0 22px;
+  }
+  .frame svg,.frame img{display:block;width:100%;height:auto;border-radius:1px;}
+
+  h2.scene-title{
+    font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic UI",sans-serif;
+    font-size:1.35rem;
+    font-weight:700;
+    margin:0 0 12px;
+    text-wrap:balance;
+  }
+
+  .narration{
+    font-size:1.06rem;
+    color:var(--ink);
+    margin:0 0 16px;
+  }
+  .narration .voice{color:var(--flame);font-weight:700;}
+
+  details.trivia{
+    background:var(--trivia-bg);
+    border:1px solid var(--trivia-edge);
+    border-radius:3px;
+    padding:2px 16px;
+    margin-bottom:8px;
+  }
+  details.trivia summary{
+    cursor:pointer;
+    list-style:none;
+    padding:12px 0;
+    font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
+    font-weight:700;
+    font-size:0.92rem;
+    color:var(--wood-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  details.trivia summary::-webkit-details-marker{display:none;}
+  details.trivia summary::before{
+    content:"";
+    width:0; height:0;
+    border-top:5px solid transparent;
+    border-bottom:5px solid transparent;
+    border-left:7px solid var(--wood-dark);
+    transition:transform .2s ease;
+    flex:none;
+  }
+  details.trivia[open] summary::before{transform:rotate(90deg);}
+  details.trivia .trivia-body{
+    padding:0 0 16px 2px;
+    color:var(--ink-soft);
+    font-size:0.92rem;
+    border-top:1px dashed var(--trivia-edge);
+    padding-top:12px;
+  }
+  details.trivia summary:focus-visible,
+  a:focus-visible{outline:2px solid var(--focus); outline-offset:3px;}
+
+  /* ---------- Closing ---------- */
+  .closing{
+    position:relative;z-index:1;
+    text-align:center;
+    padding:64px 0 12px;
+  }
+  .closing h2{
+    font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic UI",sans-serif;
+    font-size:1.6rem;margin:0 0 14px;
+  }
+  .wordlist{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    margin:26px 0 8px;padding:0;list-style:none;
+  }
+  .wordlist li{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+  .colophon{
+    margin-top:56px;
+    text-align:center;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    letter-spacing:0.05em;
+  }
+
+  @media (max-width:520px){
+    .frame{border-width:7px;}
+    .wrap{padding:0 14px 100px;}
+  }
+</style>
+
+<div class="hero">
+  <p class="hero-eyebrow">かみしばい</p>
+  <h1>柴燈護摩ってなあに</h1>
+  <p class="lead">こんがらどうじ・せいたかどうじといっしょに、火の大きなお祈り「柴燈護摩（さいとうごま）」を見にいこう。</p>
+
+  <div class="hero-art">
+    <img src="画像/Gemini_Generated_Image_1.png" width="1312" height="816" loading="eager" alt="晴れた空の下、お寺の広場で子どもがこんがらどうじ・せいたかどうじに出会う場面">
+  </div>
+
+  <div class="scrolldown" aria-hidden="true">
+    はじめる
+    <svg viewBox="0 0 16 22"><path d="M8,0 8,18 M2,12 8,18 14,12" stroke="var(--ink-soft)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+
+<div class="wrap">
+  <p class="howto"><b>読み聞かせをする方へ：</b>各場面の大きな文章を読み上げてください。「マメ知識」は開くと詳しい説明が出ます。読んでも読まなくても大丈夫です。</p>
+</div>
+
+<div class="wrap story">
+  <div class="trail" aria-hidden="true"></div>
+
+  <!-- 1 -->
+  <section class="panel" id="p1">
+    <div class="ordinal"><span class="dot"></span><span>その一　であい</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_1.png" width="1312" height="816" loading="eager" alt="お寺の広場で子どもがこんがらどうじ・せいたかどうじに出会う場面">
+    </div>
+    <h2 class="scene-title">大きな木が積んである…！</h2>
+    <p class="narration">「わあ、大きな木がいっぱい積んである…！」お寺にやってきた子どもが、広場を見て目を丸くしました。すると、ふわりと二人の小さな子が舞い降りてきます。<span class="voice">「こんにちは！　ぼくはこんがら。」「わたしはせいたか。」</span>「今日は柴燈護摩っていう、火の大きなお祈りの日なんだ。いっしょに見にいこう！」</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">こんがらどうじ・せいたかどうじは、不動明王という仏さまのそばで、いつもお手伝いをしている童子（子どもの姿をした仏さま）です。</div>
+    </details>
+  </section>
+
+  <!-- 2 -->
+  <section class="panel" id="p2">
+    <div class="ordinal"><span class="dot"></span><span>その二　山伏ってなあに</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_2.png" width="1312" height="816" loading="lazy" alt="白い装束の山伏たちが並んで歩く場面">
+    </div>
+    <h2 class="scene-title">あの白い服の人はだあれ？</h2>
+    <p class="narration">「ねえ、あの白い服の人たちは誰？」子どもがたずねると、こんがらが答えます。<span class="voice">「あの人たちは山伏（やまぶし）だよ。山にこもって歩いたり祈ったりして、心と体をきたえる修行をしているんだ。」</span>せいたかが胸をはります。「自分のわがままな心と向き合って、強くなるための修行なんだよ！」</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">山伏の修行の道を「修験道（しゅげんどう）」といいます。山を歩くこと自体が、大切な学びとされています。</div>
+    </details>
+  </section>
+
+  <!-- 3 -->
+  <section class="panel" id="p3">
+    <div class="ordinal"><span class="dot"></span><span>その三　どうぐと衣装</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_3.png" width="1312" height="816" loading="lazy" alt="山伏の道具（法螺貝・錫杖・頭巾・結袈裟）を見せる場面">
+    </div>
+    <h2 class="scene-title">見て、この道具！</h2>
+    <p class="narration">山伏さんたちの持ち物を、こんがらとせいたかが紹介してくれます。頭にかぶる頭巾（ときん）は「知恵の帽子」。肩にかける結袈裟は「みんなを守るよろい」。手に持つ法螺貝は「合図のラッパ」。そして錫杖は、振ると<span class="voice">しゃんしゃん</span>と鳴る「目覚めの杖」なのだそうです。</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">錫杖の輪の数には意味があります。鳴らす音は、山の生きものたちへの「気をつけて」の合図にもなっていたといわれています。</div>
+    </details>
+  </section>
+
+  <!-- 4 -->
+  <section class="panel" id="p4">
+    <div class="ordinal"><span class="dot"></span><span>その四　由来とねがい</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_4.png" width="1312" height="816" loading="lazy" alt="遠い昔の山と、現在の護摩壇を並べて見せる場面">
+    </div>
+    <h2 class="scene-title">どうして火を焚くの？</h2>
+    <p class="narration">「どうして火を焚くの？」子どもの問いに、せいたかが答えます。<span class="voice">「昔むかし、山にこもる前に、山伏たちは火を焚いて『これから山に入ります、見守ってください』とお祈りしたんだ。それが柴燈護摩の始まりだよ。」</span>こんがらがうなずきます。「今日は、世界が平和でありますように、みんなが元気に過ごせますように、っていう大きな願いを込めて行われるんだ。」</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">「柴（しば）」は、山でとれる木の枝のこと。柴を燃やす護摩（ごま）だから「柴燈護摩」と呼ばれます。</div>
+    </details>
+  </section>
+
+  <!-- 5 -->
+  <section class="panel" id="p5">
+    <div class="ordinal"><span class="dot"></span><span>その五　法螺作法</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_5.png" width="1312" height="816" loading="lazy" alt="山伏が法螺貝を吹き、音が山にひびく場面">
+    </div>
+    <h2 class="scene-title">ボォーーーッ</h2>
+    <p class="narration"><span class="voice">「ボォーーーッ」</span>大きな音が山じゅうに響きわたりました。山伏さんが吹く法螺貝の音です。「この音には、悪いものを吹きはらう力があるんだよ」とこんがら。儀式のはじまりの合図です。</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">法螺貝はもともと、山を歩く山伏たちが仲間に合図を送るための道具でもありました。</div>
+    </details>
+  </section>
+
+  <!-- 6 -->
+  <section class="panel" id="p6">
+    <div class="ordinal"><span class="dot"></span><span>その六　法弓・法剣作法</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_6.png" width="1312" height="816" loading="lazy" alt="山伏が弓を四方に構え、剣をかかげる場面">
+    </div>
+    <h2 class="scene-title">四方をまもる祈り</h2>
+    <p class="narration">山伏さんが弓を構え、東・西・南・北の四方に向かって祈ります。見えない悪いものを追いはらい、みんなの安全を守るためです。つづいて、光る剣がかかげられました。<span class="voice">「あれは、迷う心を断ち切って、正しい心を示しているんだよ」</span>とせいたか。</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">弓や剣は、人やものを傷つけるためではなく、悪い心や迷いを追いはらう「祈りの道具」として使われます。</div>
+    </details>
+  </section>
+
+  <!-- 7 -->
+  <section class="panel" id="p7">
+    <div class="ordinal"><span class="dot"></span><span>その七　法斧・閼伽作法</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_7.png" width="1312" height="816" loading="lazy" alt="山伏が斧をふり下ろし、水をささげる場面">
+    </div>
+    <h2 class="scene-title">えいっ、そして、そっと</h2>
+    <p class="narration">大きな斧が、えいっとふり下ろされます。「悪いものの根っこを、断ち切っているんだよ」とこんがら。つづいて、山伏さんはきれいな水をそっとささげました。「お水にも感謝するんだね」と子ども。せいたかがにっこり。<span class="voice">「そう、火も水も、自然の大切な恵みだからね」</span></p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">水をお供えする作法を「閼伽（あか）」といいます。もともと「価値あるもの」という意味の言葉です。</div>
+    </details>
+  </section>
+
+  <!-- 8 -->
+  <section class="panel" id="p8">
+    <div class="ordinal"><span class="dot"></span><span>その八　護摩木・点火・祈り</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_8.png" width="1312" height="816" loading="lazy" alt="願いを書いた護摩木が火にくべられ、炎が燃え上がる場面">
+    </div>
+    <h2 class="scene-title">みんなの願いが火の中へ</h2>
+    <p class="narration">参列した人たちは、木の札（護摩木）に自分の願いを書きました。「元気に過ごせますように」「みんな仲良くいられますように」。護摩木は積まれた薪の中に置かれ、いよいよ火がともされます。パチパチと燃え上がる炎の中、<span class="voice">みんなの願いを込めた祈りの言葉</span>が読み上げられました。</p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">護摩木を燃やす煙は、みんなの願いを空高く、天まで届けてくれると考えられています。</div>
+    </details>
+  </section>
+
+  <!-- 9 -->
+  <section class="panel" id="p9">
+    <div class="ordinal"><span class="dot"></span><span>その九　火渡り</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_9.png" width="1312" height="816" loading="lazy" alt="燃え尽きた灰の上を山伏が素足で渡る場面">
+    </div>
+    <h2 class="scene-title">はだしで、そっと</h2>
+    <p class="narration">炎が燃えつきて、灰になりました。山伏さんたちが、その灰の上を素足でそっと渡っていきます。「これを火渡りっていうんだよ」とこんがら。<span class="voice">「この火は、悪いものを焼きつくす、仏さまの知恵の火。渡ることで、病気にならず元気に過ごせますようにって祈るんだ」</span></p>
+    <details class="trivia">
+      <summary>マメ知識</summary>
+      <div class="trivia-body">火渡りには「火生三昧耶法（かしょうざんまいやほう）」という正式な名前があります。</div>
+    </details>
+  </section>
+
+  <!-- 10 -->
+  <section class="panel" id="p10">
+    <div class="ordinal"><span class="dot"></span><span>その十　むすび</span><span class="dot"></span></div>
+    <div class="frame">
+      <img src="画像/Gemini_Generated_Image_10.png" width="1312" height="816" loading="lazy" alt="子どもとこんがらどうじ・せいたかどうじが笑顔で手をふる場面">
+    </div>
+    <h2 class="scene-title">また来てね</h2>
+    <p class="narration">「どうだった？」こんがらとせいたかが、子どもに笑いかけます。<span class="voice">「柴燈護摩は、みんなの願いを、火と煙にのせて天まで届ける、特別なお祈りなんだよ。」</span>子どもも、にっこり笑いました。「また来るね！」　風がそよぎ、二人の童子はまたふわりと、どこかへ帰っていきました。</p>
+  </section>
+
+  <div class="closing">
+    <h2>今日おぼえた言葉</h2>
+    <ul class="wordlist">
+      <li>山伏</li><li>法螺</li><li>法弓</li><li>法剣</li><li>法斧</li><li>閼伽</li><li>護摩木</li><li>火渡り</li>
+    </ul>
+    <p class="colophon">柴燈護摩ってなあに</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var panels = document.querySelectorAll(".panel");
+  if(reduce || !("IntersectionObserver" in window)){
+    panels.forEach(function(p){p.classList.add("in");});
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:0.15, rootMargin:"0px 0px -8% 0px"});
+  panels.forEach(function(p){io.observe(p);});
+})();
+</script>
