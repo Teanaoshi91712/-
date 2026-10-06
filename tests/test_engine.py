@@ -1,7 +1,8 @@
 import pytest
 from pims.engine.quant import QuantEngine
-from pims.engine.llm import MockAdapter, ModelResponse
+from pims.engine.llm import MockAdapter, ModelResponse, OpenAIAdapter, get_llm_adapter
 from pims.engine.planner import TradePlanner
+from pims.config import settings
 from pims.database.models import Decision, Company, TradePlan
 from pims.database.core import Base
 from sqlalchemy import create_engine
@@ -81,6 +82,22 @@ def test_mock_llm_adapter():
     assert response.output_tokens > 0
     assert response.estimated_cost > 0.0
     assert response.latency_ms > 0
+
+def test_get_llm_adapter_factory():
+    # Test that it defaults to MockAdapter when USE_MOCK_LLM is True
+    settings.USE_MOCK_LLM = True
+    adapter = get_llm_adapter()
+    assert isinstance(adapter, MockAdapter)
+
+    # Test that it creates an OpenAIAdapter when USE_MOCK_LLM is False
+    settings.USE_MOCK_LLM = False
+    # Temporarily set a fake API key so it doesn't crash on init
+    settings.OPENAI_API_KEY = "sk-fake-key"
+    adapter = get_llm_adapter()
+    assert isinstance(adapter, OpenAIAdapter)
+
+    # Reset to default for other tests
+    settings.USE_MOCK_LLM = True
 
 def test_trade_planner(db_session):
     # Setup test data
