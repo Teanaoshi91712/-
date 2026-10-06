@@ -48,3 +48,20 @@ class ResearchOutput(BaseModel):
     hypotheses: List[str] = Field(default_factory=list)
     unknowns: List[str] = Field(default_factory=list)
     sources: List[str] = Field(default_factory=list)
+
+class ValuationOutput(BaseModel):
+    """
+    Schema for the Valuation Agent's qualitative output.
+    """
+    is_undervalued: str = Field(..., description="Yes, No, or Neutral")
+    historical_context: str = Field(..., description="Interpretation of the metrics vs historical averages")
+    peer_context: str = Field(..., description="Interpretation of the metrics vs peers")
+    market_expectations: str = Field(..., description="Interpretation of what expectations are baked into the current price")
+
+    @field_validator('is_undervalued')
+    @classmethod
+    def valid_undervalued(cls, v: str) -> str:
+        valid_options = ["YES", "NO", "NEUTRAL"]
+        if v.upper() not in valid_options:
+            raise ValueError(f"is_undervalued must be one of {valid_options}")
+        return v.upper()
