@@ -1,6 +1,30 @@
 import pytest
 from pims.engine.quant import QuantEngine
 from pims.engine.llm import MockAdapter, ModelResponse
+from pims.engine.planner import TradePlanner
+from pims.database.models import Decision, Company, TradePlan
+from pims.database.core import Base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+TEST_DATABASE_URL = "sqlite:///:memory:"
+
+@pytest.fixture(scope="module")
+def engine():
+    return create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+
+@pytest.fixture(scope="module")
+def tables(engine):
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
+
+@pytest.fixture
+def db_session(engine, tables):
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    session = SessionLocal()
+    yield session
+    session.close()
 
 def test_quant_per():
     assert QuantEngine.calculate_per(150.0, 10.0) == 15.0
@@ -57,3 +81,40 @@ def test_mock_llm_adapter():
     assert response.output_tokens > 0
     assert response.estimated_cost > 0.0
     assert response.latency_ms > 0
+
+def test_trade_planner(db_session):
+    # Setup test data
+    company = Company(ticker="TESTPLAN", name="Plan Inc.")
+    db_session.add(company)
+    db_session.commit()
+
+    decision = Decision(
+        company_id=company.id,
+        decision="BUY",
+        confidence=0.9,
+        recommended_quantity=50,
+        entry_conditions=["Under $100"]
+    )
+    db_session.add(decision)
+    db_session.commit()
+
+    # Generate Plan
+    plan = TradePlanner.generate_plan(db_session, decision.id)
+
+    assert plan.ticker == "TESTPLAN"
+    assert plan.decision == "BUY"
+    assert plan.recommended_quantity == 50
+    assert plan.status == "PENDING"
+    assert plan.preferred_order_type == "LIMIT" # Because entry conditions exist
+
+    # Test non-actionable decision
+    decision_hold = Decision(
+        company_id=company.id,
+        decision="HOLD",
+        confidence=0.9
+    )
+    db_session.add(decision_hold)
+    db_session.commit()
+
+    plan_hold = TradePlanner.generate_plan(db_session, decision_hold.id)
+    assert plan_hold.status == "CANCELLED"
