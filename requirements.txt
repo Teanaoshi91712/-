@@ -1,0 +1,5 @@
+sqlalchemy
+pydantic
+pytest
+openai
+pydantic-settings
