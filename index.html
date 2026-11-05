@@ -123,13 +123,48 @@
     <p class="lead">半年で別人に。837万回見られた「人生を変える」ためのステップを記録しよう。</p>
   </header>
 
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">次回以降、簡単に起動するためのファイルをダウンロード：</p>
+    <button onclick="downloadBat()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 0 5px;">Windows用起動ファイル (.bat)</button>
+    <button onclick="downloadCommand()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 0 5px;">Mac用起動ファイル (.command)</button>
+  </div>
   <div id="app"></div>
 
   <a href="https://youtu.be/slWKtxJ_Ouo?si=XkKHt3gZM-HyUWaD" target="_blank" class="video-link">元の動画を見る (YouTube)</a>
 </div>
 
 <script>
+
+  function downloadFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadBat() {
+    // Windows: start index.html
+    const content = '@echo off\r\nstart index.html\r\n';
+    downloadFile('起動する.bat', content);
+  }
+
+  function downloadCommand() {
+    // Mac: open index.html. Needs to be executable, but we can't set chmod via download.
+    // However, users can just double click if they configure it, or run sh.
+    // Let's provide a simple bash script.
+    const content = '#!/bin/bash\ncd "$(dirname "$0")"\nopen index.html\n';
+    downloadFile('起動する.command', content);
+    alert("Macの場合、ダウンロードした「起動する.command」を開くには、初回のみターミナルで実行権限を付与する（chmod +x 起動する.command）か、右クリックから「このアプリケーションで開く」>「ターミナル」を選択する必要がある場合があります。");
+  }
+
   const months = [
+
     { num: 1, title: "描く (Draw)", desc: "1ヶ月目: 理想の未来や目標を具体的に紙に書き出し、鮮明に描く。" },
     { num: 2, title: "消す (Erase)", desc: "2ヶ月目: 目標達成の邪魔になる習慣や物事、人間関係を断ち切る・やめる。" },
     { num: 3, title: "入れる (Insert)", desc: "3ヶ月目: 空いた時間と空間に、新しい良い習慣や知識を取り入れる。" },
