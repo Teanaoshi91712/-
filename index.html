@@ -14,6 +14,7 @@
       --text-muted: #5B564C;
       --border: #E0E0D8;
       --accent: #F17A3C;
+      --success: #4CAF50;
     }
     body {
       font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
@@ -40,8 +41,78 @@
     .lead {
       color: var(--text-muted);
       font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      background: var(--border);
+      border-radius: 10px;
+      height: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background: var(--primary);
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: right;
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: bold;
       margin-bottom: 30px;
     }
+
+    /* Controls (Buttons) */
+    .controls-panel {
+      background: var(--bg-panel);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn:hover { background: var(--primary-light); color: var(--text); }
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    .btn-outline:hover { background: var(--primary-light); color: white; border-color: var(--primary-light); }
+    .btn-accent { background: var(--accent); }
+    .btn-accent:hover { background: #e06c30; color: white;}
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+    .file-input-wrapper input[type=file] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Cards */
     .month-card {
       background: var(--bg-panel);
       border: 1px solid var(--border);
@@ -49,6 +120,11 @@
       padding: 20px;
       margin-bottom: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: border-color 0.3s;
+    }
+    .month-card.completed {
+      border-color: var(--success);
+      box-shadow: 0 2px 10px rgba(76, 175, 80, 0.15);
     }
     .month-header {
       display: flex;
@@ -69,11 +145,33 @@
       font-weight: bold;
       margin-right: 15px;
     }
+    .month-card.completed .month-number {
+      background: var(--success);
+    }
     .month-title {
       font-size: 18px;
       font-weight: bold;
       color: var(--primary);
+      flex-grow: 1;
     }
+    .month-card.completed .month-title {
+      color: var(--success);
+    }
+
+    .completion-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .completion-check input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
     .month-desc {
       font-size: 14px;
       color: var(--text-muted);
@@ -110,8 +208,29 @@
       text-decoration: none;
       font-size: 14px;
     }
-    .video-link:hover {
-      text-decoration: underline;
+
+    /* Print Styles */
+    @media print {
+      body { background: white; color: black; }
+      .controls-panel, .video-link, .save-status, .progress-container, .progress-text {
+        display: none !important;
+      }
+      .month-card {
+        border: none;
+        border-bottom: 1px solid #ccc;
+        box-shadow: none;
+        page-break-inside: avoid;
+        margin-bottom: 10px;
+        padding: 10px 0;
+      }
+      textarea {
+        border: none;
+        resize: none;
+        padding: 0;
+        min-height: auto;
+        overflow: hidden;
+      }
+      .completion-check { display: none; }
     }
   </style>
 </head>
@@ -121,21 +240,182 @@
   <header>
     <h1>人生を変える6ヶ月の地図</h1>
     <p class="lead">半年で別人に。837万回見られた「人生を変える」ためのステップを記録しよう。</p>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">0% 完了</div>
   </header>
 
+  <div class="controls-panel">
+    <div style="width: 100%; text-align: center; margin-bottom: 10px; font-size: 13px; color: var(--text-muted);">
+      記録のバックアップ・復元・印刷
+    </div>
+    <button class="btn btn-outline" onclick="exportData()">💾 データを保存 (JSON)</button>
+    <div class="file-input-wrapper">
+      <button class="btn btn-outline">📂 データを読込 (JSON)</button>
+      <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    </div>
+    <button class="btn btn-accent" onclick="window.print()">🖨️ 地図を印刷する</button>
 
-  <div style="text-align: center; margin-bottom: 20px;">
-    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">次回以降、簡単に起動するためのファイルをダウンロード：</p>
-    <button onclick="downloadBat()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 0 5px;">Windows用起動ファイル (.bat)</button>
-    <button onclick="downloadCommand()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 0 5px;">Mac用起動ファイル (.command)</button>
+    <div style="width: 100%; text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 13px; color: var(--text-muted);">
+      起動ファイルのダウンロード (PC用)
+    </div>
+    <button class="btn" onclick="downloadBat()">Windows (.bat)</button>
+    <button class="btn" onclick="downloadCommand()">Mac (.command)</button>
   </div>
+
   <div id="app"></div>
 
   <a href="https://youtu.be/slWKtxJ_Ouo?si=XkKHt3gZM-HyUWaD" target="_blank" class="video-link">元の動画を見る (YouTube)</a>
 </div>
 
 <script>
+  const months = [
+    { num: 1, title: "描く (Draw)", desc: "1ヶ月目: 理想の未来や目標を具体的に紙に書き出し、鮮明に描く。" },
+    { num: 2, title: "消す (Erase)", desc: "2ヶ月目: 目標達成の邪魔になる習慣や物事、人間関係を断ち切る・やめる。" },
+    { num: 3, title: "入れる (Insert)", desc: "3ヶ月目: 空いた時間と空間に、新しい良い習慣や知識を取り入れる。" },
+    { num: 4, title: "測る (Measure)", desc: "4ヶ月目: これまでの行動の結果を記録し、客観的に測定・評価する。" },
+    { num: 5, title: "会う (Meet)", desc: "5ヶ月目: 自分が目指す場所にいる人、憧れの人に会いに行く、コミュニティに参加する。" },
+    { num: 6, title: "出す (Output)", desc: "6ヶ月目: 学んだこと、経験したことを形にして外に出す。誰かのために使う。" }
+  ];
 
+  const app = document.getElementById('app');
+
+  // --- Rendering App ---
+  function renderApp() {
+    app.innerHTML = '';
+    months.forEach(month => {
+      const savedContent = localStorage.getItem('month_' + month.num) || '';
+      const isCompleted = localStorage.getItem('month_completed_' + month.num) === 'true';
+
+      const card = document.createElement('div');
+      card.className = 'month-card' + (isCompleted ? ' completed' : '');
+      card.id = 'card_' + month.num;
+
+      card.innerHTML = `
+        <div class="month-header">
+          <div class="month-number">${month.num}</div>
+          <div class="month-title">${month.num}ヶ月目：${month.title}</div>
+          <label class="completion-check">
+            <input type="checkbox" id="check_${month.num}" onchange="toggleCompletion(${month.num})" ${isCompleted ? 'checked' : ''}>
+            完了
+          </label>
+        </div>
+        <div class="month-desc">${month.desc}</div>
+        <textarea
+          id="textarea_${month.num}"
+          placeholder="ここに${month.num}ヶ月目の目標や行動、気づきを書き込みましょう..."
+        ></textarea>
+        <div class="save-status" id="status_${month.num}"></div>
+      `;
+
+      app.appendChild(card);
+
+      const textarea = document.getElementById('textarea_' + month.num);
+      textarea.value = savedContent;
+
+      // Auto-resize for print
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+      });
+      // Initial resize
+      textarea.style.height = 'auto';
+      textarea.style.height = (textarea.scrollHeight) + 'px';
+
+      let timeoutId;
+      textarea.addEventListener('input', (e) => {
+        clearTimeout(timeoutId);
+        const statusEl = document.getElementById('status_' + month.num);
+        statusEl.textContent = '保存中...';
+        timeoutId = setTimeout(() => {
+          saveContent(month.num, e.target.value);
+        }, 1000);
+      });
+    });
+    updateProgress();
+  }
+
+  // --- Logic ---
+  function saveContent(id, value) {
+    localStorage.setItem('month_' + id, value);
+    const statusEl = document.getElementById('status_' + id);
+    if(statusEl) {
+      statusEl.textContent = '保存しました';
+      setTimeout(() => { statusEl.textContent = ''; }, 2000);
+    }
+  }
+
+  function toggleCompletion(id) {
+    const checkbox = document.getElementById('check_' + id);
+    const card = document.getElementById('card_' + id);
+    const isCompleted = checkbox.checked;
+
+    localStorage.setItem('month_completed_' + id, isCompleted);
+
+    if(isCompleted) {
+      card.classList.add('completed');
+    } else {
+      card.classList.remove('completed');
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    let completedCount = 0;
+    months.forEach(month => {
+      if (localStorage.getItem('month_completed_' + month.num) === 'true') {
+        completedCount++;
+      }
+    });
+
+    const percentage = Math.round((completedCount / months.length) * 100);
+    document.getElementById('progressBar').style.width = percentage + '%';
+    document.getElementById('progressText').textContent = percentage + '% 完了';
+  }
+
+  // --- Export / Import ---
+  function exportData() {
+    const data = {};
+    months.forEach(month => {
+      data['month_' + month.num] = localStorage.getItem('month_' + month.num) || '';
+      data['month_completed_' + month.num] = localStorage.getItem('month_completed_' + month.num) === 'true';
+    });
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'life-map-data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        Object.keys(data).forEach(key => {
+          localStorage.setItem(key, data[key]);
+        });
+        alert('データを読み込みました！');
+        renderApp();
+      } catch (err) {
+        alert('ファイルの読み込みに失敗しました。正しいJSONファイルを選択してください。');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  }
+
+  // --- Batch Downloads ---
   function downloadFile(filename, content) {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -149,75 +429,17 @@
   }
 
   function downloadBat() {
-    // Windows: start index.html
-    const content = '@echo off\r\nstart index.html\r\n';
-    downloadFile('起動する.bat', content);
+    downloadFile('起動する.bat', '@echo off\r\nstart index.html\r\n');
   }
 
   function downloadCommand() {
-    // Mac: open index.html. Needs to be executable, but we can't set chmod via download.
-    // However, users can just double click if they configure it, or run sh.
-    // Let's provide a simple bash script.
     const content = '#!/bin/bash\ncd "$(dirname "$0")"\nopen index.html\n';
     downloadFile('起動する.command', content);
     alert("Macの場合、ダウンロードした「起動する.command」を開くには、初回のみターミナルで実行権限を付与する（chmod +x 起動する.command）か、右クリックから「このアプリケーションで開く」>「ターミナル」を選択する必要がある場合があります。");
   }
 
-  const months = [
-
-    { num: 1, title: "描く (Draw)", desc: "1ヶ月目: 理想の未来や目標を具体的に紙に書き出し、鮮明に描く。" },
-    { num: 2, title: "消す (Erase)", desc: "2ヶ月目: 目標達成の邪魔になる習慣や物事、人間関係を断ち切る・やめる。" },
-    { num: 3, title: "入れる (Insert)", desc: "3ヶ月目: 空いた時間と空間に、新しい良い習慣や知識を取り入れる。" },
-    { num: 4, title: "測る (Measure)", desc: "4ヶ月目: これまでの行動の結果を記録し、客観的に測定・評価する。" },
-    { num: 5, title: "会う (Meet)", desc: "5ヶ月目: 自分が目指す場所にいる人、憧れの人に会いに行く、コミュニティに参加する。" },
-    { num: 6, title: "出す (Output)", desc: "6ヶ月目: 学んだこと、経験したことを形にして外に出す。誰かのために使う。" }
-  ];
-
-  const app = document.getElementById('app');
-
-  function saveContent(id, value) {
-    localStorage.setItem('month_' + id, value);
-    const statusEl = document.getElementById('status_' + id);
-    statusEl.textContent = '保存しました';
-    setTimeout(() => {
-      statusEl.textContent = '';
-    }, 2000);
-  }
-
-  months.forEach(month => {
-    const savedContent = localStorage.getItem('month_' + month.num) || '';
-
-    const card = document.createElement('div');
-    card.className = 'month-card';
-
-    card.innerHTML = `
-      <div class="month-header">
-        <div class="month-number">${month.num}</div>
-        <div class="month-title">${month.num}ヶ月目：${month.title}</div>
-      </div>
-      <div class="month-desc">${month.desc}</div>
-      <textarea
-        id="textarea_${month.num}"
-        placeholder="ここに${month.num}ヶ月目の目標や行動、気づきを書き込みましょう..."
-      >${savedContent}</textarea>
-      <div class="save-status" id="status_${month.num}"></div>
-    `;
-
-    app.appendChild(card);
-
-    const textarea = document.getElementById('textarea_' + month.num);
-    let timeoutId;
-
-    textarea.addEventListener('input', (e) => {
-      clearTimeout(timeoutId);
-      const statusEl = document.getElementById('status_' + month.num);
-      statusEl.textContent = '保存中...';
-
-      timeoutId = setTimeout(() => {
-        saveContent(month.num, e.target.value);
-      }, 1000); // 1秒タイピングが止まったら自動保存
-    });
-  });
+  // Initialize
+  renderApp();
 </script>
 
 </body>
